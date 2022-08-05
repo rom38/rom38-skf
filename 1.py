@@ -6,6 +6,6 @@ import asyncio
 andd : int = 7 
 
 #%%
-andd = "hjjkhk"
+andd = "hjjkhk"  # type: ignore
 
 # %%
