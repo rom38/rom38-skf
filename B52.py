@@ -67,3 +67,35 @@ unique = set(text)
 
 print("Количество уникальных символов: ", len(unique))
 # %%
+abons = {"Иванов", "Петров", "Васильев", "Антонов"}
+
+debtors = {"Петров", "Антонов"}
+
+non_debtors = abons.difference(debtors)
+
+print(non_debtors)
+# {'Васильев', 'Иванов'}
+# %%
+# 5.2.11
+
+#a = input("Введите первую строку: ")
+#b = input("Введите вторую строку: ")
+
+a = "Введите первую строку: "
+b = "Введите вторую строку: "
+
+a_set, b_set = set(a), set(b) # используем множественное присваивание
+
+a_and_b = a_set.intersection(b_set)
+
+print(a_and_b)
+# %%
+# 5.2.12
+
+a = "1 2 3 4 5 6 7 8".split()
+b = "2 4 6 8 10 12".split()
+a_set, b_set = set(a), set(b) # используем множественное присваивание
+a_and_b = a_set.symmetric_difference(b_set)
+print(a_and_b)
+
+# %%
