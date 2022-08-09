@@ -5,4 +5,15 @@ RUN sudo apt-get update \
     mc ncdu \
  && sudo rm -rf /var/lib/apt/lists/*\
  && sudo wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.deb \
- && sudo apt install -y ./nvim-linux64.deb
+ && sudo apt install -y ./nvim-linux64.deb\
+ && sudo rm  ./nvim-linux64.deb\
+ && sudo pyenv install 3.9.13\
+ && sudo pyenv global 3.9.13\
+ && sudo mkdir ~gitpod/.config/nvim\
+ && cd ~gitpod/.config/nvim\
+ && git clone https://github.com/rom38/Neovim-from-scratch .\
+ && git switch dev\
+ && nvim +PackerUpdate +qa\
+ && pip install neovim\
+ && pip install pyright\
+ && npm install -g neovim
