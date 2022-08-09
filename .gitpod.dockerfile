@@ -11,8 +11,8 @@ RUN sudo apt-get update \
  && pyenv global 3.9.13\
  && sudo mkdir .config/nvim\
  && cd .config/nvim\
- && git clone https://github.com/rom38/Neovim-from-scratch .\
- && git switch dev\
+ && sudo git clone https://github.com/rom38/Neovim-from-scratch .\
+ && sudo git switch dev\
  && nvim +PackerUpdate +qa\
  && pip install neovim\
  && pip install pyright\
