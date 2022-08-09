@@ -5,4 +5,4 @@ RUN sudo apt-get update \
     mc ncdu \
  && sudo rm -rf /var/lib/apt/lists/*\
  && sudo wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.deb \
- && sudo apt install ./nvim-linux64.deb
+ && sudo apt install -y ./nvim-linux64.deb
