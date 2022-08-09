@@ -1,6 +1,4 @@
 # %%
-from tkinter import N
-
 
 def linear_solve(a, b):
     if a: 
