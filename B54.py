@@ -126,3 +126,48 @@ print(next(iter_obj))
 print(next(iter_obj)) 
 print(next(iter_obj)) 
 # %%
+import time
+
+for i in range(100):
+    time.sleep(0.1)
+    print('Downloading File FooFile.txt [%d%%]\r'%i, end="")
+
+# %%
+# 5.4.15
+
+USERS = ['admin', 'guest', 'director', 'root', 'superstar']
+
+yesno = input("""Введите Y, если хотите авторизоваться или N, 
+             если хотите продолжить работу как анонимный пользователь: """)
+
+auth = yesno.upper() == "Y"
+
+if auth:
+    username = input("Введите ваш username:")
+
+def is_auth(func):
+    def wrapper():
+        if auth:
+            print(f"Пользователь авторизован")
+            func()
+        else:
+            print("Пользователь неавторизован. Функция выполнена не будет")
+    return wrapper
+
+def has_access(func):
+    def wrapper():
+        if username in USERS:
+            print(f"Пользователю {username} разрешен доступ")
+            func()
+        else:
+            print(f"Пользователю {username} запрещен доступ. Функция выполнена не будет")
+    return wrapper
+
+
+@is_auth
+@has_access
+def from_db():
+    print("some data from database")
+
+from_db()
+# %%
