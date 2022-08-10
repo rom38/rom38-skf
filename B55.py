@@ -32,11 +32,11 @@ print(list(result))   # [-2, 0, 2]
 # %%
 some_list = [i - 10 for i in range(20)]
 def pow2(x): return x**2
-def positive(x): return x > 0
+def positive_2(x): return x > 0
 
 
 print(some_list)
-print(list(map(pow2, filter(positive, some_list))))
+print(list(map(pow2, filter(positive_2, some_list))))
 # %%
 some_list = [i - 10 for i in range(20)]
 [i**2 for i in some_list if i > 0]
