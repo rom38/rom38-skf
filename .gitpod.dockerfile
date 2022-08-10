@@ -13,9 +13,9 @@ RUN sudo apt-get update \
  && cd .config/nvim\
  && sudo git clone https://github.com/rom38/Neovim-from-scratch .\
  && sudo git switch dev\
- && nvim +PackerInstall +qa\
- && nvim +PackerUpdate +qa\
+ && nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'\
+ && nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'\
  && pip install neovim\
- && pip install pyright\
- && pip install ipykernel\
  && npm install -g neovim
+#  && pip install pyright\
+#  && pip install ipykernel\
