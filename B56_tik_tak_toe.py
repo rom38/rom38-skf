@@ -9,6 +9,7 @@ BOARD: list = [i for i in '123456789']
 def print_board(BOARD: list, show_num=True):
     'Печать доски'
     BOARD2=[]
+
     # выключение печати цифр
     if not show_num:
          for i in BOARD:
@@ -55,14 +56,16 @@ def greet():
     print("     случайный метод                 ")
     print(" 7.  Бот - Бот                       ")
     print("     метод перебора                  ")
-    print(" 8.  Выйти из программы              ")
+    print(" 0.  Выйти из программы              ")
     print("-----------------------------")
 
-
+def wrong():
+    print("-----------------------------")
+    print(" Вы ввели некорректный режим ")
 
 def ask_mode():
     print("-----------------------------")
-    return input("    Выберите режим работы:   ")
+    return input(" Выберите режим работы:   ")
 
 
 def BOARD_unset_fields_to_list(BOARD: list):
@@ -126,8 +129,40 @@ def win_check(BD: list, sign: str):
     else:
         return False
 
+def turn_cmp(BOARD:list, sign:str, step:int):
+     # Winner check
+    # проверка на выигрыш
+    if win_check(BOARD,sign):
+        print(f'Sign {sign} winner!!!')
+        print(f'Знак {sign} победил!!!\n')
+        print_board(BOARD, show_num=False)
 
-greet()
+        # выход
+        print(f' Текущая игра окончена\n')
+        return False
+    else:
+
+        # If no winner, check steps
+        # Если нет победителя, проверить на
+        # оставшиеся ходы 
+        if step == 9:
+            print(f'Ходов больше нет! Игра окончена!\n')
+            print_board(BOARD, show_num=False)
+            return False
+        else:
+            step += 1
+        return True
+
+def turn_bot_rnd(board:list,sign:str):
+    "Случайный ход бота"
+    from random import choice
+    free_cells=[i for i in board if i not in "XO"]
+    return int(choice(free_cells))-1
+
+
+
+
+# greet()
 # BOARD[3-1] = 'X'
 # print(BOARD_unset_fields_to_list(BOARD))
 # print_board(BOARD)
@@ -140,7 +175,7 @@ greet()
 
 # print_board(BOARD)
 
-def start_HH():
+def start_HH(BOARD:list):
     # - current sign
     sign = 'X' 
     # - current sign
@@ -154,39 +189,91 @@ def start_HH():
 
         # - if 0 - exit
         if cell+1 == 0:
-            print(f'Выход из текущей игры \n')
+            print(f' Выход из текущей игры \n')
+            break
+        
+        
+
+        # - if in range [1-9] proceed game process
+        else:
+            BOARD[cell] = sign
+            if not turn_cmp(BOARD,sign,step):
+                break
+            step += 1
+            # Replace current sign
+            # смена текущего знака
+            sign = 'O' if sign == 'X' else 'X'
+
+# greet()
+# BOARD[3-1] = 'X'
+# print(BOARD_unset_fields_to_list(BOARD))
+# print_board(BOARD)
+
+# num_2 = (ask_num(BOARD)-1)
+
+# print(num_2)
+# BOARD[num_2] = 'X'
+
+
+# print_board(BOARD)
+
+def start_HXBR(BOARD:list):
+    # - current sign
+    sign = 'X' 
+    # - current sign
+    step = 1    
+    while True:
+        # - print current game board
+        print_board(BOARD)
+
+        # - wait & check user input
+        cell = ask_num(BOARD, sign)-1
+
+        # - if 0 - exit
+        if cell+1 == 0:
+            print(f' Выход из текущей игры \n')
             break
 
         # - if in range [1-9] proceed game process
         else:
             BOARD[cell] = sign
-
-            # Winner check
-            # проверка на выигрыш
-            if win_check(BOARD,sign):
-                print(f'Sign {sign} winner!!!')
-                print(f'Знак {sign} победил!!!\n')
-                print_board(BOARD, show_num=False)
-
-                # выход
-                print(f'Текущая игра окончена\n')
+            if not turn_cmp(BOARD,sign,step):
                 break
-            else:
-
-                # If no winner, check steps
-                # Если нет победителя, проверить на
-                # оставшиеся ходы 
-                if step == 9:
-                    print(f'\n Ходов больше нет! Игра окончена!')
-                    print_board(BOARD, show_num=False)
-                    break
-                else:
-                    step += 1
+            step += 1
             # Replace current sign
             # смена текущего знака
             sign = 'O' if sign == 'X' else 'X'
-       
-# %%
-start_HH()
+            cell = turn_bot_rnd(BOARD, sign)
+            BOARD[cell] = sign
+            if not turn_cmp(BOARD,sign,step):
+                break
+            step += 1
+            sign = 'O' if sign == 'X' else 'X'
+
 
 # %%
+# start_HH()
+
+def loop():
+    greet()
+    
+    while True:
+        BOARD: list = [i for i in '123456789']
+        mode = ask_mode()
+        if mode == "1":
+            start_HH(BOARD)
+        elif mode == "2":
+            start_HXBR(BOARD)
+            #data.append(ask_spend())
+        elif mode == "3":
+            pass
+        elif mode == "0":
+            print(f' Выход из программы\n')
+            break
+        else:
+            wrong()
+    
+# %%
+if __name__ == '__main__':
+
+    loop()
