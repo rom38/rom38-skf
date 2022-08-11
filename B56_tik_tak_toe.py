@@ -101,7 +101,7 @@ def win_check(BD: list, sign: str):
     # if BDS[0:9:4] == sign or BDS[2:7:2] == sign:
     #     return True
 
-    # проверка
+    # компактная проверка
     if any(map(lambda x: x == sign,
 
         # по горизонтале
