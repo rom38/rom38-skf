@@ -6,8 +6,18 @@
 # - Game board for print
 BOARD: list = [i for i in '123456789']
 
-def print_board(BOARD: list):
+def print_board(BOARD: list, show_num=True):
     'Печать доски'
+    BOARD2=[]
+    # выключение печати цифр
+    if not show_num:
+         for i in BOARD:
+            if i in ['X','O']:
+                BOARD2.append(i)
+            else:
+                BOARD2.append(' ')
+            BOARD = BOARD2
+
     print("="*11)
     print(f' {BOARD[0]} | {BOARD[1]} | {BOARD[2] }')
     print("---+"*2+"---")
@@ -150,22 +160,30 @@ def start_HH():
         # - if in range [1-9] proceed game process
         else:
             BOARD[cell] = sign
-            # - Winner check
+
+            # Winner check
+            # проверка на выигрыш
             if win_check(BOARD,sign):
                 print(f'Sign {sign} winner!!!')
                 print(f'Знак {sign} победил!!!\n')
+                print_board(BOARD, show_num=False)
 
-                print_board(BOARD)
+                # выход
+                print(f'Текущая игра окончена\n')
                 break
             else:
-                # - If no winner, check steps
+
+                # If no winner, check steps
+                # Если нет победителя, проверить на
+                # оставшиеся ходы 
                 if step == 9:
                     print(f'\n Ходов больше нет! Игра окончена!')
-                    print_board(BOARD)
+                    print_board(BOARD, show_num=False)
                     break
                 else:
                     step += 1
-            # - Replace current sign
+            # Replace current sign
+            # смена текущего знака
             sign = 'O' if sign == 'X' else 'X'
        
 # %%
