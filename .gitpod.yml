@@ -12,7 +12,7 @@ image:
 #     onOpen: open-preview
 tasks:
   - name: bash history
-    command: mkdir /workspace/.pers
+    init: mkdir /workspace/.pers
 
     # command: |
     #   sudo mkdir /workspace/.pers
