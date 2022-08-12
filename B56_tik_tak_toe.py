@@ -161,33 +161,19 @@ def turn_bot_rnd(board:list,sign:str):
 
 
 
-
-# greet()
-# BOARD[3-1] = 'X'
-# print(BOARD_unset_fields_to_list(BOARD))
-# print_board(BOARD)
-
-# num_2 = (ask_num(BOARD)-1)
-
-# print(num_2)
-# BOARD[num_2] = 'X'
-
-
-# print_board(BOARD)
-
 def start_HH(BOARD:list):
     # - current sign
     sign = 'X' 
     # - current sign
     step = 1    
     while True:
-        # - print current game board
+        # print current game board
         print_board(BOARD)
 
-        # - wait & check user input
+        # wait & check user input
         cell = ask_num(BOARD, sign)-1
 
-        # - if 0 - exit
+        # if 0 - exit
         if cell+1 == 0:
             print(f' Выход из текущей игры \n')
             break
@@ -243,6 +229,10 @@ def start_HXBR(BOARD:list):
             # Replace current sign
             # смена текущего знака
             sign = 'O' if sign == 'X' else 'X'
+
+            # Bot turn
+            print(" Ход бота!")
+            print_board(BOARD)
             cell = turn_bot_rnd(BOARD, sign)
             BOARD[cell] = sign
             if not turn_cmp(BOARD,sign,step):
@@ -250,7 +240,36 @@ def start_HXBR(BOARD:list):
             step += 1
             sign = 'O' if sign == 'X' else 'X'
 
+def start_BBR(BOARD:list):
+    # - current sign
+    sign = 'X' 
+    # - current sign
+    step = 1    
+    while True:
+        # - print current game board
+        print_board(BOARD)
 
+        # - wait & check user input
+        cell = turn_bot_rnd(BOARD, sign)
+        print(f" Ход бота! {sign}")
+
+        BOARD[cell] = sign
+        if not turn_cmp(BOARD,sign,step):
+            break
+        step += 1
+        # Replace current sign
+        # смена текущего знака
+        sign = 'O' if sign == 'X' else 'X'
+
+        # Bot turn
+        print_board(BOARD)
+        print(f" Ход бота! {sign}")
+        cell = turn_bot_rnd(BOARD, sign)
+        BOARD[cell] = sign
+        if not turn_cmp(BOARD,sign,step):
+            break
+        step += 1
+        sign = 'O' if sign == 'X' else 'X'
 # %%
 # start_HH()
 
@@ -267,6 +286,12 @@ def loop():
             #data.append(ask_spend())
         elif mode == "3":
             pass
+        elif mode == "4":
+            pass
+        elif mode == "5":
+            pass
+        elif mode == "6":
+            start_BBR(BOARD)
         elif mode == "0":
             print(f' Выход из программы\n')
             break
