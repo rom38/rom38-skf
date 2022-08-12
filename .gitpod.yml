@@ -12,10 +12,12 @@ image:
 #     onOpen: open-preview
 tasks:
   - name: bash history
-    command: |
-      sudo mkdir /workspace/.pers
-      sudo touch /workspace/.pers/.bash_history
-      sudo echo "HISTFILE = /workspace/.pers/.bash_history" >> /home/gitpod/.bash_profile
-      echo "ooooooo"
+    command: mkdir /workspace/.pers
+
+    # command: |
+    #   sudo mkdir /workspace/.pers
+    #   sudo touch /workspace/.pers/.bash_history
+    #   sudo echo "HISTFILE = /workspace/.pers/.bash_history" >> /home/gitpod/.bash_profile
+    #   echo "ooooooo"
      
     
