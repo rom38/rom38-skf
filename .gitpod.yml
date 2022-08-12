@@ -10,3 +10,11 @@ image:
 # ports:
 #   - port: 3000
 #     onOpen: open-preview
+tasks:
+  - name: bash history
+    before: |
+      mkdir /workspace/.pers
+      touch /workspace/.pers/.bash_history
+      echo "HISTFILE = /workspace/.pers/.bash_history" >> ~/.bash_profile
+     
+    
