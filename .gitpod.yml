@@ -13,8 +13,8 @@ image:
 tasks:
   - name: bash history
     before: |
-      mkdir /workspace/.pers
-      touch /workspace/.pers/.bash_history
-      echo "HISTFILE = /workspace/.pers/.bash_history" >> /home/gitpod/.bash_profile
+      sudo mkdir /workspace/.pers
+      sudo touch /workspace/.pers/.bash_history
+      sudo echo "HISTFILE = /workspace/.pers/.bash_history" >> /home/gitpod/.bash_profile
      
     
