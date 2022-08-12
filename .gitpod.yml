@@ -12,7 +12,7 @@ image:
 #     onOpen: open-preview
 tasks:
   - name: bash history
-    command: |
+    before: |
       mkdir /workspace/.pers
       touch /workspace/.pers/.bash_history
       echo "HISTFILE = /workspace/.pers/.bash_history" >> /home/gitpod/.bash_profile
