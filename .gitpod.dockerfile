@@ -19,5 +19,4 @@ RUN sudo apt-get update \
  && npm install -g neovim\
  && sudo mkdir /workspace/.pers\
  && sudo touch /workspace/.pers/.bash_history\
- && sudo rm /home/gitpod/.bash_history\
  && sudo ln -s /workspace/.pers/.bash_history /home/gitpod/.bash_history
