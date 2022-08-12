@@ -16,6 +16,7 @@ RUN sudo apt-get update \
  && nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'\
  && nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'\
  && pip install neovim\
- && npm install -g neovim
-#  && pip install pyright\
-#  && pip install ipykernel\
+ && npm install -g neovim\
+ && sudo mkdir /workspace/.pers\
+ && sudo touch /workspace/.pers/.bash_history\
+ && sudo echo "HISTFILE = /workspace/.pers/.bash_history" >> /home/gitpod/.bash_profile
