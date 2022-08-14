@@ -14,7 +14,6 @@ class Cat:
         return self.age
 
 
-
 class Dog(Cat):
-     def get_pet(self):
+    def get_pet(self):
         return self.get_name(), self.get_age()  
