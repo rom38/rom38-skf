@@ -1,9 +1,8 @@
 # %%
-# # - Game board for print
-# BOARD = {1: '1', 2: '2', 3: '3',
-#          4: '4', 5: '5', 6: '6',
-#          7: '7', 8: '8', 9: '9', }
-# - Game board for print
+
+from typing import Callable
+
+
 BOARD: list = [i for i in '123456789']
 
 
@@ -102,10 +101,8 @@ def win_check(BD: list, sign: str):
 
     # приведем список к строке
     BDS = ''.join(BD)
-
     # утроим знак
     sign = sign*3
-
     # компактная проверка
     if any(map(lambda x: x == sign,
                [BDS[0:3],   BDS[3:6],   BDS[6:9],     # по горизонтале
@@ -117,27 +114,16 @@ def win_check(BD: list, sign: str):
 
 
 def turn_cmp(BOARD: list, sign: str, step: int):
-    # Winner check
     # проверка на выигрыш
     if win_check(BOARD, sign):
         print(f'Sign {sign} winner!!!')
         print(f'Знак {sign} победил!!!\n')
-        # print_board(BOARD, show_num=False)
-
-        # выход
-        print(f' Текущая игра окончена\n')
+        print(' Текущая игра окончена\n')
         return False
-    else:
-
-        # If no winner, check steps
-        # Если нет победителя, проверить на
-        # оставшиеся ходы
-        if step == 9:
-            print(f'Ходов больше нет! Игра окончена!\n')
-            #print_board(BOARD, show_num=False)
-            return False
-        step += 1
-        return True
+    if len([i for i in BOARD if i not in "XO"]) == 0:
+        print('Ходов больше нет! Игра окончена!\n')
+        return False
+    return True
 
 
 def turn_bot_rnd(board: list):
@@ -175,18 +161,6 @@ def start_HH(BOARD: list):
         # смена текущего знака
         sign = 'O' if sign == 'X' else 'X'
 
-# greet()
-# BOARD[3-1] = 'X'
-# print(BOARD_unset_fields_to_list(BOARD))
-# print_board(BOARD)
-
-# num_2 = (ask_num(BOARD)-1)
-
-# print(num_2)
-# BOARD[num_2] = 'X'
-
-
-# print_board(BOARD)
 
 def start_HXBR(BOARD: list):
     # - current sign
@@ -202,7 +176,7 @@ def start_HXBR(BOARD: list):
 
         # - if 0 - exit
         if cell+1 == 0:
-            print(f' Выход из текущей игры \n')
+            print(' Выход из текущей игры \n')
             break
 
         # - if in range [1-9] proceed game process
@@ -225,37 +199,101 @@ def start_HXBR(BOARD: list):
             step += 1
             sign = 'O' if sign == 'X' else 'X'
 
-
-def start_BBR(BOARD: list):
+def start_BB(BOARD: list, turn_func: Callable):
     # - current sign
-    sign = 'X'
-    # - current sign
-    step = 1
-    while True:
-        # - print current game board
-        print_board(BOARD)
-
-        # - wait & check user input
-        cell = turn_bot_rnd(BOARD)
+    free_cells = [i for i in BOARD if i not in "XO"]
+    step = 9 - len(free_cells)
+    # определяем знак следующего хода
+    sign = 'X' if step % 2 == 0 else 'O'
+    print(" Исходная доска")
+    print_board(BOARD)
+    for cell in free_cells:
         print(f" Ход бота! {sign}")
-
+        cell = turn_func(BOARD)
         BOARD[cell] = sign
+        print_board(BOARD)
         if not turn_cmp(BOARD, sign, step):
             break
-        step += 1
-        # Replace current sign
         # смена текущего знака
         sign = 'O' if sign == 'X' else 'X'
 
-        # Bot turn
-        print_board(BOARD)
-        print(f" Ход бота! {sign}")
-        cell = turn_bot_rnd(BOARD)
-        BOARD[cell] = sign
-        if not turn_cmp(BOARD, sign, step):
+
+def turn_bot_pereb(BOARD: list, num_comb=1000):
+    '''Функция берет на вход доску, симулирует 
+    1000 игр, и выдает оптимальный номер ячейки'''
+
+    win_dict = {}
+    ind_win = ''
+    ind_bal = ''
+    BOARD = BOARD.copy()
+    free_cells = [i for i in BOARD if i not in "XO"]
+    step = 9 - len(free_cells)
+    # определяем знак следующего хода
+    sign = 'X' if step % 2 == 0 else 'O'
+    # последоватьлно ставим следующий знак в свободные ячейки
+    for cell in free_cells:
+        win_dict[cell] = [0, 0, 0]
+        BOARD_2 = BOARD.copy()
+        sign_2 = sign
+        BOARD_2[int(cell)-1] = sign_2
+        # step_2 = step + 1
+        if win_check(BOARD_2, sign_2) and sign_2 == 'X':
+            win_dict[cell][0] += 1
             break
-        step += 1
-        sign = 'O' if sign == 'X' else 'X'
+        if win_check(BOARD_2, sign_2) and sign_2 == 'O':
+            win_dict[cell][1] += 1
+            break
+        if len([i for i in BOARD_2 if i not in "XO"]) == 0:
+            win_dict[cell][2] += 1
+            break
+        sign_2 = 'X' if sign_2 == 'O' else 'O'
+        # перебор num_comb случайных комбинаций
+        for _ in range(num_comb):
+            x_win, o_win, xo_win = sim_game(BOARD_2)
+            win_dict[cell][0] += x_win
+            win_dict[cell][1] += o_win
+            win_dict[cell][2] += xo_win
+    print(win_dict)
+    cmp_var = 0
+    cmp_bal = 0
+    for ind in win_dict.items():
+        if sign == 'X':
+            if cmp_var <= ind[1][0]:
+                cmp_var = ind[1][0]
+                ind_win = ind[0]
+        if sign == 'O':
+            if cmp_var <= ind[1][1]:
+                cmp_var = ind[1][1]
+                ind_win = ind[0]
+        if cmp_bal <= ind[1][2]:
+            cmp_bal = ind[1][2]
+            ind_bal = ind[0]
+    if cmp_bal > cmp_var:
+        return int(ind_bal)-1
+    print(ind_win)
+    return int(ind_win)-1
+
+
+def sim_game(BOARD):
+    x_win, o_win, xo_win = 0, 0, 0
+    BOARD_2 = BOARD.copy()
+    free_cells = [i for i in BOARD_2 if i not in "XO"]
+    step = 9 - len(free_cells)
+    sign = 'X' if step % 2 == 0 else 'O'
+    for _ in free_cells:
+        cell_3 = turn_bot_rnd(BOARD_2)
+        BOARD_2[cell_3] = sign
+        if win_check(BOARD_2, sign) and sign == 'X':
+            x_win += 1
+            break
+        if win_check(BOARD_2, sign) and sign == 'O':
+            o_win += 1
+            break
+        if len([i for i in BOARD_2 if i not in "XO"]) == 0:
+            xo_win += 1
+            break
+        sign = 'X' if sign == 'O' else 'O'
+    return x_win, o_win, xo_win
 # %%
 # start_HH()
 
@@ -278,9 +316,11 @@ def loop():
         elif mode == "5":
             pass
         elif mode == "6":
-            start_BBR(BOARD)
+            start_BB(BOARD, turn_bot_rnd)
+        elif mode == "7":
+            start_BB(BOARD, turn_bot_pereb)
         elif mode == "0":
-            print(f' Выход из программы\n')
+            print(' Выход из программы\n')
             break
         else:
             wrong()
@@ -327,71 +367,8 @@ def start_BBR2(BOARD: list):
 # %%
 
 
-def perebor(BOARD: list, num_comb=1000):
-    '''Функция берет на вход доску, симулирует 
-    1000 игр, и выдает оптимальный номер ячейки'''
-
-    win_dict = {}
-    ind_f = ''
-    BOARD = BOARD.copy()
-    free_cells = [i for i in BOARD if i not in "XO"]
-    step = 9 - len(free_cells)
-    # определяем знак следующего хода
-    sign = 'X' if step % 2 == 0 else 'O'
-    # последоватьлно ставим следующий знак в свободные ячейки
-    for cell in free_cells:
-        win_dict[cell] = [0, 0, 0]
-        BOARD_2 = BOARD.copy()
-        sign_2 = sign
-        BOARD_2[int(cell)-1] = sign_2
-        # step_2 = step + 1
-        if len([i for i in BOARD_2 if i not in "XO"]) == 0:
-            break
-        sign_2 = 'X' if sign_2 == 'O' else 'O'
-        # перебор num_comb случайных комбинаций
-        for _ in range(num_comb):
-            x_win, o_win, xo_win = sim_game(BOARD_2)
-            win_dict[cell][0] += x_win
-            win_dict[cell][1] += o_win
-            win_dict[cell][2] += xo_win
-    print(win_dict)
-    cmp_var = 0
-    for ind in win_dict.items():
-        if sign == 'X':
-            if cmp_var < ind[1][0]:
-                cmp_var = ind[1][0]
-                ind_f = ind[0]
-        if sign == 'O':
-            if cmp_var < ind[1][1]:
-                cmp_var = ind[1][1]
-                ind_f = ind[0]
-    return int(ind_f)
-
-
-def sim_game(BOARD):
-    x_win, o_win, xo_win = 0, 0, 0
-    BOARD_2 = BOARD.copy()
-    free_cells = [i for i in BOARD_2 if i not in "XO"]
-    step = 9 - len(free_cells)
-    sign = 'X' if step % 2 == 0 else 'O'
-    for _ in free_cells:
-        cell_3 = turn_bot_rnd(BOARD_2)
-        BOARD_2[cell_3] = sign
-        if win_check(BOARD_2, sign) and sign == 'X':
-            x_win += 1
-            break
-        if win_check(BOARD_2, sign) and sign == 'O':
-            o_win += 1
-            break
-        if len([i for i in BOARD_2 if i not in "XO"]) == 0:
-            xo_win += 1
-            break
-        sign = 'X' if sign == 'O' else 'O'
-    return x_win, o_win, xo_win
-
-
 BOARD = list('X23XO6789')
-print(perebor(BOARD))
+print(turn_bot_pereb(BOARD))
 
 
 # %%
