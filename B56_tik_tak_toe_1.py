@@ -1,7 +1,7 @@
 # %%
 
 from typing import Callable
-
+from random import choice
 
 BOARD: list = list('123456789')
 
@@ -9,7 +9,6 @@ BOARD: list = list('123456789')
 def print_board(BOARD: list, show_num=True):
     'Печать доски'
     BOARD2 = []
-
     # выключение печати цифр
     if not show_num:
         for i in BOARD:
@@ -48,9 +47,9 @@ def greet():
     print("     случайный метод                 ")
     print(" 3.  Человек крестик -  Бот нолик    ")
     print("     метод перебора                  ")
-    print(" 4.  Бот крестик - Человек нолик-    ")
+    print(" 4.  Бот крестик - Человек нолик     ")
     print("     случайный метод                 ")
-    print(" 5.  Бот крестик - Человек нолик-    ")
+    print(" 5.  Бот крестик - Человек нолик     ")
     print("     метод перебора                  ")
     print(" 6.  Бот - Бот                       ")
     print("     случайный метод                 ")
@@ -109,8 +108,7 @@ def win_check(BD: list, sign: str):
                 BDS[0:7:3], BDS[1:8:3], BDS[2:9:3],   # по вертикали
                 BDS[0:9:4], BDS[2:7:2]])):            # по диагонали
         return True
-    else:
-        return False
+    return False
 
 
 def turn_cmp(BOARD: list, sign: str):
@@ -128,7 +126,6 @@ def turn_cmp(BOARD: list, sign: str):
 
 def turn_bot_rnd(board: list):
     "Случайный ход бота"
-    from random import choice
     free_cells = [i for i in board if i not in "XO"]
     if not free_cells:
         print("Все клетки заняты не могу ходить!")
@@ -148,7 +145,7 @@ def start_HH(BOARD: list):
         # if 0 - exit
         if cell+1 == 0:
             print(' Выход из текущей игры \n')
-            break        
+            break
         BOARD[cell] = sign
         print_board(BOARD)
         if not turn_cmp(BOARD, sign):
@@ -173,7 +170,7 @@ def start_HXB(BOARD: list, bot_func: Callable):
                 print(' Выход из текущей игры \n')
                 break
         elif sign == 'O':
-            print(f" Ход бота {sign}!")
+            print(f" Ход Бота {sign}!")
             cell = bot_func(BOARD)
 
         BOARD[cell] = sign
@@ -219,7 +216,7 @@ def start_BB(BOARD: list, bot_func: Callable):
     print(" Исходная доска")
     print_board(BOARD)
     for cell in free_cells:
-        print(f" Ход бота {sign}!")
+        print(f" Ход Бота {sign}!")
         cell = bot_func(BOARD)
         BOARD[cell] = sign
         print_board(BOARD)
@@ -230,7 +227,7 @@ def start_BB(BOARD: list, bot_func: Callable):
 
 
 def turn_bot_pereb(BOARD: list, num_comb=1000):
-    '''Функция берет на вход доску, симулирует 
+    '''Функция берет на вход доску, симулирует
     1000 игр, и выдает оптимальный номер ячейки'''
 
     win_dict = {}
@@ -267,6 +264,9 @@ def turn_bot_pereb(BOARD: list, num_comb=1000):
     # print(win_dict)
     cmp_var = 0
     cmp_bal = 0
+    # можно использовать
+    # конструкцию max(win_dict, key=lambda key: win_dict[key][1])
+    # но мне так больше нравиться, меньше итераций
     for ind in win_dict.items():
         if sign == 'X':
             if cmp_var <= ind[1][0]:
@@ -287,20 +287,20 @@ def turn_bot_pereb(BOARD: list, num_comb=1000):
 
 def sim_game(BOARD):
     x_win, o_win, xo_win = 0, 0, 0
-    BOARD_2 = BOARD.copy()
-    free_cells = [i for i in BOARD_2 if i not in "XO"]
+    BOARD = BOARD.copy()
+    free_cells = [i for i in BOARD if i not in "XO"]
     step = 9 - len(free_cells)
     sign = 'X' if step % 2 == 0 else 'O'
     for _ in free_cells:
-        cell_3 = turn_bot_rnd(BOARD_2)
-        BOARD_2[cell_3] = sign
-        if win_check(BOARD_2, sign) and sign == 'X':
+        cell_3 = turn_bot_rnd(BOARD)
+        BOARD[cell_3] = sign
+        if win_check(BOARD, sign) and sign == 'X':
             x_win += 1
             break
-        if win_check(BOARD_2, sign) and sign == 'O':
+        if win_check(BOARD, sign) and sign == 'O':
             o_win += 1
             break
-        if len([i for i in BOARD_2 if i not in "XO"]) == 0:
+        if len([i for i in BOARD if i not in "XO"]) == 0:
             xo_win += 1
             break
         sign = 'X' if sign == 'O' else 'O'
