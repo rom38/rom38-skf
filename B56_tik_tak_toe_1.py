@@ -306,13 +306,11 @@ def sim_game(BOARD):
         sign = 'X' if sign == 'O' else 'O'
     return x_win, o_win, xo_win
 # %%
-# start_HH()
 
 
 def loop():
-    greet()
-
     while True:
+        greet()
         BOARD: list = [i for i in '123456789']
         mode = ask_mode()
         if mode == "1":
@@ -335,10 +333,10 @@ def loop():
             break
         else:
             wrong()
+        input("Нажмите Enter для продолжения")
 
 
 # %%
 if __name__ == '__main__':
 
     loop()
-
