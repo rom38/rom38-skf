@@ -152,7 +152,7 @@ def win_check(BD: list, sign: str):
     sign = sign*3
     # компактная проверка
     if any(map(lambda x: x == sign,
-               [BDS[0:3],   BDS[3:6],   BDS[6:9],     # по горизонтале
+               [BDS[0:3],   BDS[3:6],   BDS[6:9],     # по горизонтали
                 BDS[0:7:3], BDS[1:8:3], BDS[2:9:3],   # по вертикали
                 BDS[0:9:4], BDS[2:7:2]])):            # по диагонали
         return True
@@ -366,7 +366,6 @@ def loop():
             start_HH(BOARD)
         elif mode == "2":
             start_HXB(BOARD, turn_bot_rnd)
-            # data.append(ask_spend())
         elif mode == "3":
             start_HXB(BOARD, turn_bot_pereb)
         elif mode == "4":
