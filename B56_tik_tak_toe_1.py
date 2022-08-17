@@ -6,7 +6,7 @@ from random import choice
 BOARD: list = list('123456789')
 
 
-def print_board(BOARD: list, show_num=True):
+def print_board_old(BOARD: list, show_num=True):
     'Печать доски'
     BOARD2 = []
     # выключение печати цифр
@@ -25,6 +25,29 @@ def print_board(BOARD: list, show_num=True):
     print("---+"*2+"---")
     print(f' {BOARD[6]} | {BOARD[7]} | {BOARD[8]} ')
     print("="*11+'\n')
+
+
+def print_board(BOARD: list, show_num=False):
+    'Печать доски'
+    BOARD2 = []
+    # выключение печати цифр
+    if not show_num:
+        for i in BOARD:
+            if i in ['X', 'O']:
+                BOARD2.append(i)
+            else:
+                BOARD2.append(' ')
+            BOARD = BOARD2
+
+    print("="*14)
+    print("    0   1   2 ")
+    print("  +"+"---+"*2+"---")
+    print(f'0 | {BOARD[0]} | {BOARD[1]} | {BOARD[2] }')
+    print("  +"+"---+"*2+"---")
+    print(f'1 | {BOARD[3]} | {BOARD[4]} | {BOARD[5]} ')
+    print("  +"+"---+"*2+"---")
+    print(f'2 | {BOARD[6]} | {BOARD[7]} | {BOARD[8]} ')
+    print("="*14+'\n')
 
 
 def greet():
@@ -78,21 +101,46 @@ def BOARD_unset_fields_to_list(BOARD: list):
     return result
 
 
-def ask_num(BOARD: list, sign: str):
+def ask_num_old(BOARD: list, sign: str):
     number = None
     while number is None:
         num_str = input(
-            f"Введите номер ячейки для {sign} от 1 до 9, либо 0 для выхода из игры: ")
+            f"Введите координаты номера ячейки для {sign}"
+            " от 0 до 2, либо 9 для выхода из игры: ")
         print()
         if num_str.isdigit() and num_str in '0123456789':
             if num_str in BOARD_unset_fields_to_list(BOARD) or num_str == '0':
                 number = int(num_str)
             else:
-                print(" Введенный вами номер клеточки занят!\n")
+                print(" Введенный вами номер ячейки занят!\n")
         else:
             print(" Вы ввели некорректный номер!\n")
             continue
     return number
+
+
+def ask_num(BOARD: list, sign: str):
+    num = 0
+    while True:
+        coord_str = input(
+            f"Введите координаты ячейки через пробел для {sign}"
+            " от 0 до 2, либо 0 для выхода из игры: ")
+        print()
+        if coord_str == '0':
+            return 0
+
+        if not (set(coord_str) < set("012 ") and
+                len(coord_str) == 3 and
+                coord_str[1] == ' '):
+            print(" Вы ввели некорректный номер!\n")
+            continue
+        x, y = coord_str.split(' ')
+        num = int(x) + int(y) * 3 + 1
+
+        if str(num) in BOARD_unset_fields_to_list(BOARD):
+            break
+        print(" Введенный вами номер ячейки занят!\n")
+    return num
 
 
 def win_check(BD: list, sign: str):
@@ -286,6 +334,7 @@ def turn_bot_pereb(BOARD: list, num_comb=1000):
 
 
 def sim_game(BOARD):
+    'симуляция одной игры'
     x_win, o_win, xo_win = 0, 0, 0
     BOARD = BOARD.copy()
     free_cells = [i for i in BOARD if i not in "XO"]
@@ -340,3 +389,5 @@ def loop():
 if __name__ == '__main__':
 
     loop()
+
+# %%
