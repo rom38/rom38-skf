@@ -15,6 +15,9 @@ class Dot():
         if self.x == alt_dot.x and self.y == alt_dot.y:
             return True
         return False
+        
+    def __repr__(self) -> str:
+        return f'Dot(x={self.x}, y={self.y})'
 
 
 class Ship():
@@ -28,10 +31,17 @@ class Ship():
 
 
 class Board():
-    map: list[list]
+    map_br: list[list] = []
     ships: list[Ship]
     hid: bool
     live_ships: int
+
+    def __init__(self):
+        for i in range(6):
+            self.map_br.append([])
+            for j in range(6):
+                self.map_br[i].append(Dot(j, i))
+
 
     def add_ship(self):
         pass
@@ -94,4 +104,7 @@ class Game():
         self.greet()
         self.loop()
 
+# %%
+xxx = Board()
+print(xxx.map_br)
 # %%
