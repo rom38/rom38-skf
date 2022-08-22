@@ -15,33 +15,52 @@ class Dot():
         if self.x == alt_dot.x and self.y == alt_dot.y:
             return True
         return False
-        
+
+    def near(self):
+        dots_near: list = []
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if i == 0 and j == 0:
+                    continue
+                dots_near.append(Dot(self.x + i, self.y + j))
+        return dots_near
+
     def __repr__(self) -> str:
         return f'Dot(x={self.x}, y={self.y})'
 
 
 class Ship():
-    len_sh: int = 0
+    sh_len: int
     nos: Dot
     vrt_hrz: bool
     life: int
 
+    def __init__(self, nos: Dot, sh_len: int, vrt_hrz: bool):
+        self.nos = nos
+        self.sh_len = sh_len
+        self.vrt_hrz = vrt_hrz
+
     def dots(self):
-        pass
+        dots_sh = []
+        for i in range(self.sh_len):
+            if self.vrt_hrz:
+                dots_sh.append(Dot(self.nos.x, self.nos.y+i))
+            else:
+                dots_sh.append(Dot(self.nos.x+i, self.nos.y))
+        return dots_sh
 
 
 class Board():
-    map_br: list[list] = []
     ships: list[Ship]
     hid: bool
     live_ships: int
 
     def __init__(self):
-        for i in range(6):
+        self.map_br = []
+        for y in range(6):
             self.map_br.append([])
-            for j in range(6):
-                self.map_br[i].append(Dot(j, i))
-
+            for x in range(6):
+                self.map_br[y].append("O")
 
     def add_ship(self):
         pass
@@ -50,6 +69,17 @@ class Board():
         pass
 
     def show(self):
+        map_vis: str = "   |"
+        for xh in range(len(self.map_br[0])):
+            map_vis += f" {xh+1} |"
+        map_vis += '\n'
+        for yn, y in enumerate(self.map_br):
+            map_vis += f' {yn+1} |'
+            for x in y:
+                map_vis += f" {x} |"
+            map_vis += '\n'
+        return map_vis[:-1].split('\n')
+
         # hid: bool
         pass
 
@@ -91,6 +121,15 @@ class Game():
     ai: AI
     ai_board: Board
 
+    def __init__(self) -> None:
+        self.user_board = Board()
+        self.ai_board = Board()
+
+    def show_two_board(self):
+        for y1, y2 in zip(self.user_board.show(),
+                          self.ai_board.show()):
+            print(f"{y1}       {y2}")
+
     def random_board(self):
         pass
 
@@ -104,7 +143,16 @@ class Game():
         self.greet()
         self.loop()
 
+
 # %%
 xxx = Board()
-print(xxx.map_br)
+# print(xxx.map_br)
+print(xxx.show())
+# %%
+dd = Dot(1, 1)
+dd.near()
+# %%
+
+ggg = Game()
+ggg.show_two_board()
 # %%
