@@ -80,7 +80,7 @@ class Ship():
         for dot_sh in self.dots():
             for dot_nr in dot_sh.near():
                 cont_sh.append(dot_nr)
-        return cont_sh
+        return list(set(cont_sh)-set(self.dots()))
 
 
 
@@ -151,7 +151,7 @@ class Board():
                 for i, sh_len in enumerate([3, 2, 2, 1, 1, 1, 1]):
                     # print(i, sh_len)
                     if not all_dots:
-                        continue
+                        break
                     ships.append(Ship(random.choice(all_dots), sh_len,
                                     random.choice([True, False])))
                     for dot in ships[i].dots():
@@ -160,18 +160,21 @@ class Board():
                     for dot in ships[i].cont():
                         if dot in all_dots:
                             all_dots.remove(dot)
+                if len(ships) != 7:
+                    continue
                 all_sh_dots = [dot for ship in ships for dot in ship.dots()]
                 all_sh_conts = [dot for ship in ships for dot in ship.cont()]
-                if (all_sh_dots == list(set(all_sh_dots))):# and
-                        # set(all_sh_dots) not in set(all_sh_conts)):
+                # print(all_sh_dots)
+                # print()
+                # print(list(set(all_sh_dots)))
+                if (len(all_sh_dots) == len(set(all_sh_dots)) and
+                        set(all_sh_dots).isdisjoint(set(all_sh_conts))):
                     print(all_sh_dots)
                     self.ships = ships
                     break
-            except DotOutBoard as e:
-                print(e)
+            except DotOutBoard:
                 continue
-            except ShipOutBoard as e:
-                print(e)
+            except ShipOutBoard:
                 continue
 
 
@@ -214,25 +217,6 @@ class Game():
         for y1, y2 in zip(self.user_board.show_ln(),
                           self.ai_board.show_ln()):
             print(f"{y1}       {y2}")
-
-    def random_board(self):
-        all_dots = [Dot(x, y)
-                    for x in range(6)
-                    for y in range(6)]
-        ships = []
-        while True:
-            for i, sh_len in enumerate([3, 2, 2, 1, 1, 1, 1]):
-                ships[i] = Ship(random.choice(all_dots), sh_len,
-                                random.choice([True, False]))
-                for dot in ships[i].dots():
-                    all_dots.remove(dot)
-                for dot in ships[i].cont():
-                    all_dots.remove(dot)
-            all_sh_dots = [dot for ship in ships for dot in ship.dots()]
-            all_sh_conts = [dot for ship in ships for dot in ship.conts()]
-            if (all_sh_dots == list(set(all_sh_dots)) and
-                    set(all_sh_dots) not in set(all_sh_conts)):
-                return ships
 
 
     def greet(self) -> str:
