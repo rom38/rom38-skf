@@ -1,10 +1,22 @@
 # %%
+import random
+
+
 class BoardExeption(Exception):
     pass
 
+class ShipOutBoard(BoardExeption):
+    pass
+
+class DotOutBoard(BoardExeption):
+    pass
 
 class Dot():
     def __init__(self, x: int, y: int) -> None:
+        if not (1 <= x <= 6 and
+                1 <= y <= 6):
+            raise DotOutBoard('координаты точки выходят за'
+                              'границы доски')
         self.x = x
         self.y = y
 
@@ -16,11 +28,17 @@ class Dot():
             return True
         return False
 
+    def __hash__(self):
+        return hash(f"dot {self.x}{self.y}")
+
     def near(self):
         dots_near: list = []
         for i in range(-1, 2):
             for j in range(-1, 2):
                 if i == 0 and j == 0:
+                    continue
+                if not (1 <= self.x + i <= 6 and
+                        1 <= self.y + j <= 6):
                     continue
                 dots_near.append(Dot(self.x + i, self.y + j))
         return dots_near
@@ -36,9 +54,17 @@ class Ship():
     life: int
 
     def __init__(self, nos: Dot, sh_len: int, vrt_hrz: bool):
+        if ((vrt_hrz and nos.y + sh_len > 6) or
+                (not vrt_hrz and nos.x + sh_len > 6) or
+                sh_len < 0):
+            raise ShipOutBoard('координаты корабля выходят за'
+                               'границы доски')
         self.nos = nos
         self.sh_len = sh_len
         self.vrt_hrz = vrt_hrz
+
+
+
 
     def dots(self):
         dots_sh = []
@@ -49,21 +75,41 @@ class Ship():
                 dots_sh.append(Dot(self.nos.x+i, self.nos.y))
         return dots_sh
 
+    def cont(self):
+        cont_sh = []
+        for dot_sh in self.dots():
+            for dot_nr in dot_sh.near():
+                cont_sh.append(dot_nr)
+        return cont_sh
+
+
 
 class Board():
+    map_br: list[list[str]]
     ships: list[Ship]
     hid: bool
     live_ships: int
 
     def __init__(self):
         self.map_br = []
+        self.ships = []
         for y in range(6):
             self.map_br.append([])
             for x in range(6):
                 self.map_br[y].append("O")
 
-    def add_ship(self):
-        pass
+    def show_ships(self):
+        for ship in self.ships:
+            for i in ship.dots():
+                self.map_br[i.y-1][i.x-1] = '■'
+
+    def show_cont(self):
+        for ship in self.ships:
+            for i in ship.cont():
+                self.map_br[i.y-1][i.x-1] = 'N'
+
+    def add_ship(self, ship: Ship):
+        self.ships.append(ship)
 
     def contour(self):
         pass
@@ -78,10 +124,13 @@ class Board():
             for x in y:
                 map_vis += f" {x} |"
             map_vis += '\n'
-        return map_vis[:-1].split('\n')
+        return map_vis[:-1]
 
         # hid: bool
         pass
+
+    def show_ln(self):
+        return self.show().split('\n')
 
     def out(self) -> bool:
         # exeption out, retry
@@ -89,6 +138,42 @@ class Board():
 
     def shot(self):
         pass
+
+    def random_board(self):
+        all_dots_orig = [Dot(x, y)
+                    for x in range(1, 7)
+                    for y in range(1, 7)]
+        # ships = []
+        while True:
+            ships = []
+            all_dots = all_dots_orig.copy()
+            try:
+                for i, sh_len in enumerate([3, 2, 2, 1, 1, 1, 1]):
+                    # print(i, sh_len)
+                    if not all_dots:
+                        continue
+                    ships.append(Ship(random.choice(all_dots), sh_len,
+                                    random.choice([True, False])))
+                    for dot in ships[i].dots():
+                        if dot in all_dots:
+                            all_dots.remove(dot)
+                    for dot in ships[i].cont():
+                        if dot in all_dots:
+                            all_dots.remove(dot)
+                all_sh_dots = [dot for ship in ships for dot in ship.dots()]
+                all_sh_conts = [dot for ship in ships for dot in ship.cont()]
+                if (all_sh_dots == list(set(all_sh_dots))):# and
+                        # set(all_sh_dots) not in set(all_sh_conts)):
+                    print(all_sh_dots)
+                    self.ships = ships
+                    break
+            except DotOutBoard as e:
+                print(e)
+                continue
+            except ShipOutBoard as e:
+                print(e)
+                continue
+
 
 
 class Player():
@@ -126,12 +211,29 @@ class Game():
         self.ai_board = Board()
 
     def show_two_board(self):
-        for y1, y2 in zip(self.user_board.show(),
-                          self.ai_board.show()):
+        for y1, y2 in zip(self.user_board.show_ln(),
+                          self.ai_board.show_ln()):
             print(f"{y1}       {y2}")
 
     def random_board(self):
-        pass
+        all_dots = [Dot(x, y)
+                    for x in range(6)
+                    for y in range(6)]
+        ships = []
+        while True:
+            for i, sh_len in enumerate([3, 2, 2, 1, 1, 1, 1]):
+                ships[i] = Ship(random.choice(all_dots), sh_len,
+                                random.choice([True, False]))
+                for dot in ships[i].dots():
+                    all_dots.remove(dot)
+                for dot in ships[i].cont():
+                    all_dots.remove(dot)
+            all_sh_dots = [dot for ship in ships for dot in ship.dots()]
+            all_sh_conts = [dot for ship in ships for dot in ship.conts()]
+            if (all_sh_dots == list(set(all_sh_dots)) and
+                    set(all_sh_dots) not in set(all_sh_conts)):
+                return ships
+
 
     def greet(self) -> str:
         return "greet"
@@ -154,5 +256,22 @@ dd.near()
 # %%
 
 ggg = Game()
+ggg.user_board.add_ship(Ship(Dot(1, 1), 3, False))
+
+ggg.user_board.add_ship(Ship(Dot(1, 3), 3, True))
+ggg.user_board.show_cont()
+ggg.user_board.show_ships()
+
+ggg.ai_board.random_board()
+ggg.ai_board.show_cont()
+ggg.ai_board.show_ships()
+
+
 ggg.show_two_board()
+# %%
+shhh = Ship(Dot(1, 1), 1, True)
+shhh.dots()
+# %%
+ggg = Game()
+ggg.random_board()
 # %%
