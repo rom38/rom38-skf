@@ -5,11 +5,14 @@ import random
 class BoardExeption(Exception):
     pass
 
+
 class ShipOutBoard(BoardExeption):
     pass
 
+
 class DotOutBoard(BoardExeption):
     pass
+
 
 class Dot():
     def __init__(self, x: int, y: int) -> None:
@@ -63,9 +66,6 @@ class Ship():
         self.sh_len = sh_len
         self.vrt_hrz = vrt_hrz
 
-
-
-
     def dots(self):
         dots_sh = []
         for i in range(self.sh_len):
@@ -81,7 +81,6 @@ class Ship():
             for dot_nr in dot_sh.near():
                 cont_sh.append(dot_nr)
         return list(set(cont_sh)-set(self.dots()))
-
 
 
 class Board():
@@ -104,6 +103,7 @@ class Board():
                 self.map_br[i.y-1][i.x-1] = '■'
 
     def show_cont(self):
+        'отображение контуров кораблей'
         for ship in self.ships:
             for i in ship.cont():
                 self.map_br[i.y-1][i.x-1] = 'N'
@@ -141,42 +141,38 @@ class Board():
 
     def random_board(self):
         all_dots_orig = [Dot(x, y)
-                    for x in range(1, 7)
-                    for y in range(1, 7)]
-        # ships = []
+                         for x in range(1, 7)
+                         for y in range(1, 7)]
+        ships_def = [3, 2, 2, 1, 1, 1, 1]
         while True:
             ships = []
             all_dots = all_dots_orig.copy()
             try:
-                for i, sh_len in enumerate([3, 2, 2, 1, 1, 1, 1]):
-                    # print(i, sh_len)
+                for i, sh_len in enumerate(ships_def):
                     if not all_dots:
                         break
                     ships.append(Ship(random.choice(all_dots), sh_len,
-                                    random.choice([True, False])))
-                    for dot in ships[i].dots():
-                        if dot in all_dots:
-                            all_dots.remove(dot)
-                    for dot in ships[i].cont():
-                        if dot in all_dots:
-                            all_dots.remove(dot)
-                if len(ships) != 7:
+                                      random.choice([True, False])))
+                    # отнимаем от всех точек точки сгенерированного
+                    # корабля и его контура
+                    all_dots = (list(set(all_dots)
+                                     - set(ships[i].dots())
+                                     - set(ships[i].cont())))
+
+                if len(ships) != len(ships_def):
                     continue
                 all_sh_dots = [dot for ship in ships for dot in ship.dots()]
                 all_sh_conts = [dot for ship in ships for dot in ship.cont()]
-                # print(all_sh_dots)
-                # print()
-                # print(list(set(all_sh_dots)))
+                # проверяем, чтобы корабли не пересекались и их
+                # контуры были свободны
                 if (len(all_sh_dots) == len(set(all_sh_dots)) and
                         set(all_sh_dots).isdisjoint(set(all_sh_conts))):
-                    print(all_sh_dots)
                     self.ships = ships
                     break
             except DotOutBoard:
                 continue
             except ShipOutBoard:
                 continue
-
 
 
 class Player():
@@ -200,7 +196,26 @@ class AI(Player):
 
 
 class User(Player):
-    pass
+
+    def ask(self, BOARD):
+        while True:
+            coord_str = input(
+                "Введите координаты клеточки через пробел "
+                " от 1 до 6, либо 0 для выхода из игры: ")
+            print()
+            if coord_str == '0':
+                return 0
+
+            if not (len(coord_str) == 3 and
+                    coord_str[1] == ' '):
+                print(" Вы ввели некорректный номер!\n")
+                continue
+            dot_shot = Dot(*map(int, coord_str.split(' ')))
+            break
+            # if str(num) in BOARD_unset_fields_to_list(BOARD):
+            #     break
+            print(" Введенный вами номер ячейки занят!\n")
+        return dot_shot
 
 
 class Game():
@@ -218,9 +233,24 @@ class Game():
                           self.ai_board.show_ln()):
             print(f"{y1}       {y2}")
 
-
     def greet(self) -> str:
-        return "greet"
+        greet_str = (
+            "-----------Приветствуем вас в  приложении-----------------------\n"
+            "----------------------------------------------------------------\n"
+            "----------------- Морской бой ----------------------------------\n"
+            "----------------------------------------------------------------\n"
+            "- Вам необходимо поочередно указывать координаты клеточки куда -\n"
+            "- будет наносится выстрел артиллерии. В случае попадания во    -\n"
+            "- вражеский корабль Вам предоставляется дополнительный ход.    -\n"
+            "------------------------------\n"
+            "        Режимы работы:        \n"
+            "------------------------------\n"
+            " 1.  Человек - Человек               \n"
+            " 2.  Человек крестик -  Бот нолик    \n"
+            "     случайный метод                 \n"
+            " 0.  Выйти из программы              \n"
+            "-----------------------------")
+        return greet_str
 
     def loop(self):
         self.user.move()
@@ -243,6 +273,8 @@ ggg = Game()
 ggg.user_board.add_ship(Ship(Dot(1, 1), 3, False))
 
 ggg.user_board.add_ship(Ship(Dot(1, 3), 3, True))
+
+ggg.user_board.random_board()
 ggg.user_board.show_cont()
 ggg.user_board.show_ships()
 
@@ -257,5 +289,6 @@ shhh = Ship(Dot(1, 1), 1, True)
 shhh.dots()
 # %%
 ggg = Game()
-ggg.random_board()
+print(ggg.greet())
+
 # %%
