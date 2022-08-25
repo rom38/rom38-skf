@@ -221,8 +221,13 @@ class Player():
 
 
 class AI(Player):
-    pass
-
+    def ask(self):
+        while True:
+            x = random.choice(range(1, 7))
+            y = random.choice(range(1, 7))
+            dot_shot = Dot(x, y)
+            if dot_shot in self.enemy_board.shots:
+                continue
 
 class User(Player):
 
