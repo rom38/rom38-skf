@@ -10,11 +10,22 @@ class ShipOutBoard(BoardExeption):
     pass
 
 
+class ShotDouble(BoardExeption):
+    pass
+
+
 class DotOutBoard(BoardExeption):
     pass
 
 
+class ExitGame(BoardExeption):
+    pass
+
+
 class Dot():
+    x: int
+    y: int
+
     def __init__(self, x: int, y: int) -> None:
         if not (1 <= x <= 6 and
                 1 <= y <= 6):
@@ -26,7 +37,6 @@ class Dot():
     def __eq__(self, alt_dot: 'Dot'):
         if not isinstance(alt_dot, Dot):
             raise ValueError("Передано неправильное значение")
-            # return False
         if self.x == alt_dot.x and self.y == alt_dot.y:
             return True
         return False
@@ -88,16 +98,24 @@ class Board():
     ships: list[Ship]
     hid: bool
     live_ships: int
+    shots: list[Dot]
 
     def __init__(self):
-        self.map_br = []
         self.ships = []
+        self.shots = []
+        self.map_reset()
+
+    def map_reset(self):
+        'сброс карты'
+        __map_etal = []
         for y in range(6):
-            self.map_br.append([])
-            for x in range(6):
-                self.map_br[y].append("O")
+            __map_etal.append([])
+            for _x in range(6):
+                __map_etal[y].append("O")
+        self.map_br = __map_etal.copy()
 
     def show_ships(self):
+        'отображение кораблей'
         for ship in self.ships:
             for i in ship.dots():
                 self.map_br[i.y-1][i.x-1] = '■'
@@ -108,11 +126,16 @@ class Board():
             for i in ship.cont():
                 self.map_br[i.y-1][i.x-1] = 'N'
 
+    def show_shots(self):
+        'отображение выстрелов'
+        for shot in self.shots:
+            if self.map_br[shot.y-1][shot.x-1] == 'O':
+                self.map_br[shot.y-1][shot.x-1] = 'T'
+            elif self.map_br[shot.y-1][shot.x-1] == '■':
+                self.map_br[shot.y-1][shot.x-1] = 'X'
+
     def add_ship(self, ship: Ship):
         self.ships.append(ship)
-
-    def contour(self):
-        pass
 
     def show(self):
         map_vis: str = "   |"
@@ -137,7 +160,9 @@ class Board():
         return True
 
     def shot(self):
-        pass
+        self.map_reset()
+        self.show_ships()
+        self.show_shots()
 
     def random_board(self):
         all_dots_orig = [Dot(x, y)
@@ -179,6 +204,10 @@ class Player():
     my_board: Board
     enemy_board: Board
 
+    def __init__(self, my_b: Board, en_b: Board):
+        self.my_board = my_b
+        self.enemy_board = en_b
+
     def ask(self):
         pass
 
@@ -197,20 +226,24 @@ class AI(Player):
 
 class User(Player):
 
-    def ask(self, BOARD):
+    def ask(self):
         while True:
             coord_str = input(
                 "Введите координаты клеточки через пробел "
                 " от 1 до 6, либо 0 для выхода из игры: ")
             print()
             if coord_str == '0':
-                return 0
+                raise ExitGame
 
             if not (len(coord_str) == 3 and
                     coord_str[1] == ' '):
-                print(" Вы ввели некорректный номер!\n")
+                print(" Вы ввели некорректный номер!\n"
+                      " Повторите ввод!\n")
                 continue
             dot_shot = Dot(*map(int, coord_str.split(' ')))
+            if dot_shot in self.enemy_board.shots:
+                raise ShotDouble('Выстрел в эту ячейку уже был!')
+            self.enemy_board.shots.append(dot_shot)
             break
             # if str(num) in BOARD_unset_fields_to_list(BOARD):
             #     break
@@ -227,37 +260,83 @@ class Game():
     def __init__(self) -> None:
         self.user_board = Board()
         self.ai_board = Board()
+        self.user = User(self.user_board, self.ai_board)
+        self.ai = AI(self.ai_board, self.user_board)
 
     def show_two_board(self):
+        print(""" ----------  User  ---------        -----------  AI  ----------""")
         for y1, y2 in zip(self.user_board.show_ln(),
                           self.ai_board.show_ln()):
             print(f"{y1}       {y2}")
 
     def greet(self) -> str:
-        greet_str = (
-            "-----------Приветствуем вас в  приложении-----------------------\n"
-            "----------------------------------------------------------------\n"
-            "----------------- Морской бой ----------------------------------\n"
-            "----------------------------------------------------------------\n"
-            "- Вам необходимо поочередно указывать координаты клеточки куда -\n"
-            "- будет наносится выстрел артиллерии. В случае попадания во    -\n"
-            "- вражеский корабль Вам предоставляется дополнительный ход.    -\n"
-            "------------------------------\n"
-            "        Режимы работы:        \n"
-            "------------------------------\n"
-            " 1.  Человек - Человек               \n"
-            " 2.  Человек крестик -  Бот нолик    \n"
-            "     случайный метод                 \n"
-            " 0.  Выйти из программы              \n"
+        gr_str = (
+            "-----------Приветствуем вас в  приложении----------------------\n"
+            "---------------------------------------------------------------\n"
+            "-------------------- Морской бой ------------------------------\n"
+            "---------------------------------------------------------------\n"
+            "- Вам  необходимо  поочередно указывать  координаты  клеточки -\n"
+            "- куда будет наносится выстрел артиллерии. В случае попадания -\n"
+            "- во вражеский корабль Вам предоставляется дополнительный ход.-\n"
+            "------------------------------------------------------------\n"
+            "                    Режимы работы:                          \n"
+            "------------------------------------------------------------\n"
+            " 1.  Начать игру                                            \n"
+            " 2.  Сгенерировать новое расположение кораблей              \n"
+            " 0.  Выйти из программы                                     \n"
             "-----------------------------")
-        return greet_str
+        return gr_str
 
     def loop(self):
-        self.user.move()
+        for _ in range(10):
+            print(self.greet())
+            self.user_board.random_board()
+            self.user_board.map_reset()
+            self.user_board.show_ships()
+            self.ai_board.random_board()
+            self.ai_board.map_reset()
+            self.ai_board.show_ships()
+            self.show_two_board()
+            mode = self.ask_mode()
+            if mode == '1':
+                while True:
+                    try:
+                        self.user.move()
+                        self.show_two_board()
+                    except ExitGame:
+                        print('Выход из текущей игры')
+                        break
+                    except DotOutBoard as e_1:
+                        print(e_1)
+                        print('повторите ввод')
+                        self.show_two_board()
+                        continue
+                    except ShotDouble as e_2:
+                        print(e_2)
+                        print('повторите ввод')
+                        self.show_two_board()
+                        continue
+            elif mode == '2':
+                print('Генерирую новое расположение кораблей')
+                continue
+            elif mode == '0':
+                print('Выход из программы')
+                break
 
     def start(self):
-        self.greet()
+        print(self.greet())
+        self.user_board.random_board()
+        self.user_board.show_cont()
+        self.user_board.show_ships()
+        self.ai_board.random_board()
+        self.ai_board.show_cont()
+        self.ai_board.show_ships()
+        self.show_two_board()
         self.loop()
+    
+    def ask_mode(self):
+        print("-----------------------------")
+        return input(" Выберите режим работы:   ")
 
 
 # %%
@@ -279,8 +358,11 @@ ggg.user_board.show_cont()
 ggg.user_board.show_ships()
 
 ggg.ai_board.random_board()
-ggg.ai_board.show_cont()
+# ggg.ai_board.show_cont()
 ggg.ai_board.show_ships()
+ggg.ai_board.shots.append(Dot(1, 1))
+ggg.ai_board.shots.append(Dot(1, 2))
+ggg.ai_board.show_shots()
 
 
 ggg.show_two_board()
@@ -289,6 +371,7 @@ shhh = Ship(Dot(1, 1), 1, True)
 shhh.dots()
 # %%
 ggg = Game()
-print(ggg.greet())
+# print(ggg.greet())
+ggg.start()
 
 # %%
