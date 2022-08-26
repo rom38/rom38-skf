@@ -75,6 +75,7 @@ class Ship():
         self.nos = nos
         self.sh_len = sh_len
         self.vrt_hrz = vrt_hrz
+        self.life = sh_len
 
     def dots(self):
         dots_sh = []
@@ -97,10 +98,11 @@ class Board():
     map_br: list[list[str]]
     ships: list[Ship]
     hid: bool
-    live_ships: int
+    # live_ships: int
     shots: list[Dot]
 
     def __init__(self):
+        self.hid = True
         self.ships = []
         self.shots = []
         self.map_reset()
@@ -138,7 +140,8 @@ class Board():
         self.ships.append(ship)
 
     def show(self):
-        map_vis: str = "   |"
+        map_vis: str = f"  потоплено {self.sink_ships()} из {len(self.ships)} кораблей \n"
+        map_vis += "   |"
         for xh in range(len(self.map_br[0])):
             map_vis += f" {xh+1} |"
         map_vis += '\n'
@@ -147,6 +150,8 @@ class Board():
             for x in y:
                 map_vis += f" {x} |"
             map_vis += '\n'
+        if self.hid:
+            map_vis = map_vis.replace('■', 'O')
         return map_vis[:-1]
 
         # hid: bool
@@ -158,6 +163,36 @@ class Board():
     def ships_dots(self):
         'возврат точек всех кораблей'
         return [dot for ship in self.ships for dot in ship.dots()]
+
+    def plus_shot(self):
+        'Дополнительный ход при попадании'
+        return self.shots[-1] in self.ships_dots()
+
+    def check_ships(self):
+        'Проверка кораблей'
+        for ship in self.ships:
+            hits = set(self.shots) & set(ship.dots())
+            if hits:
+                ship.life = ship.sh_len - len(hits)
+
+    def live_ships(self):
+        self.check_ships()
+        live = 0
+        for ship in self.ships:
+            if ship.life > 0:
+                live += 1
+        return live
+
+    def sink_ships(self):
+        self.check_ships()
+        sink = 0
+        for ship in self.ships:
+            if ship.life == 0:
+                sink += 1
+        return sink
+
+    def all_ships_sink(self):
+        return set(self.ships_dots()).issubset(set(self.shots))
 
     def out(self) -> bool:
         # exeption out, retry
@@ -232,6 +267,8 @@ class AI(Player):
             dot_shot = Dot(x, y)
             if dot_shot in self.enemy_board.shots:
                 continue
+            self.enemy_board.shots.append(dot_shot)
+            break
 
 class User(Player):
 
@@ -273,10 +310,11 @@ class Game():
         self.ai = AI(self.ai_board, self.user_board)
 
     def show_two_board(self):
-        print(""" ----------  User  ---------        -----------  AI  ----------""")
+        print(""" ---------  Игрок  ---------        -----------  AI  ----------""")
         for y1, y2 in zip(self.user_board.show_ln(),
                           self.ai_board.show_ln()):
             print(f"{y1}       {y2}")
+        print()
 
     def greet(self) -> str:
         gr_str = (
@@ -302,18 +340,41 @@ class Game():
             self.user_board.random_board()
             self.user_board.map_reset()
             self.user_board.show_ships()
+            self.user_board.hid = False
             self.ai_board.random_board()
             self.ai_board.map_reset()
             self.ai_board.show_ships()
-            self.show_two_board()
             mode = self.ask_mode()
+            self.show_two_board()
             if mode == '1':
                 while True:
                     try:
-                        self.user.move()
-                        self.show_two_board()
+                        while True:
+                            self.user.move()
+                            if self.ai_board.all_ships_sink():
+                                print('Игрок потопил все корабли!')
+                                self.show_two_board()
+                                raise ExitGame
+                            self.show_two_board()
+                            if self.user.enemy_board.plus_shot():
+                                print('Игрок попал в корабль! Дополнительный ход.')
+                                continue
+                            break
+                        print('Ход AI')
+                        while True:
+                            self.ai.move()
+                            if self.ai_board.all_ships_sink():
+                                print('Игрок потопил все корабли!')
+                                self.show_two_board()
+                                raise ExitGame
+                            self.show_two_board()
+                            if self.ai.enemy_board.plus_shot():
+                                print('AI попал в корабль! Дополнительный ход.')
+                                continue
+                            break
                     except ExitGame:
                         print('Выход из текущей игры')
+                        input("Нажмите Enter для продолжения")
                         break
                     except DotOutBoard as e_1:
                         print(e_1)
@@ -333,18 +394,18 @@ class Game():
                 break
 
     def start(self):
-        print(self.greet())
-        self.user_board.random_board()
-        self.user_board.show_cont()
-        self.user_board.show_ships()
-        self.ai_board.random_board()
-        self.ai_board.show_cont()
-        self.ai_board.show_ships()
-        self.show_two_board()
+        # print(self.greet())
+        # self.user_board.random_board()
+        # self.user_board.show_cont()
+        # self.user_board.show_ships()
+        # self.ai_board.random_board()
+        # self.ai_board.show_cont()
+        # self.ai_board.show_ships()
+        # self.show_two_board()
         self.loop()
     
     def ask_mode(self):
-        print("-----------------------------")
+        print("--------------------------------"*2)
         return input(" Выберите режим работы:   ")
 
 
