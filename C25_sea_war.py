@@ -155,6 +155,10 @@ class Board():
     def show_ln(self):
         return self.show().split('\n')
 
+    def ships_dots(self):
+        'возврат точек всех кораблей'
+        return [dot for ship in self.ships for dot in ship.dots()]
+
     def out(self) -> bool:
         # exeption out, retry
         return True
@@ -250,10 +254,10 @@ class User(Player):
                 raise ShotDouble('Выстрел в эту ячейку уже был!')
             self.enemy_board.shots.append(dot_shot)
             break
-            # if str(num) in BOARD_unset_fields_to_list(BOARD):
-            #     break
-            print(" Введенный вами номер ячейки занят!\n")
-        return dot_shot
+        if dot_shot in self.enemy_board.ships_dots():
+            print('Игрок попал в корабль')
+            return True
+        return False
 
 
 class Game():
