@@ -154,9 +154,6 @@ class Board():
             map_vis = map_vis.replace('■', 'O')
         return map_vis[:-1]
 
-        # hid: bool
-        pass
-
     def show_ln(self):
         return self.show().split('\n')
 
@@ -335,7 +332,7 @@ class Game():
         return gr_str
 
     def loop(self):
-        for _ in range(10):
+        while True:
             print(self.greet())
             self.user_board.random_board()
             self.user_board.map_reset()
