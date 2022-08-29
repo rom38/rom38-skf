@@ -140,7 +140,8 @@ class Board():
         self.ships.append(ship)
 
     def show(self):
-        map_vis: str = f"  потоплено {self.sink_ships()} из {len(self.ships)} кораблей \n"
+        map_vis: str = (f"  потоплено {self.sink_ships()} "
+                        f"из {len(self.ships)} кораблей \n")
         map_vis += "   |"
         for xh in range(len(self.map_br[0])):
             map_vis += f" {xh+1} |"
@@ -267,6 +268,7 @@ class AI(Player):
             self.enemy_board.shots.append(dot_shot)
             break
 
+
 class User(Player):
 
     def ask(self):
@@ -322,13 +324,13 @@ class Game():
             "- Вам  необходимо  поочередно указывать  координаты  клеточки -\n"
             "- куда будет наносится выстрел артиллерии. В случае попадания -\n"
             "- во вражеский корабль Вам предоставляется дополнительный ход.-\n"
-            "------------------------------------------------------------\n"
-            "                    Режимы работы:                          \n"
-            "------------------------------------------------------------\n"
-            " 1.  Начать игру                                            \n"
-            " 2.  Сгенерировать новое расположение кораблей              \n"
-            " 0.  Выйти из программы                                     \n"
-            "-----------------------------")
+            "---------------------------------------------------------------\n"
+            "                    Режимы работы:                             \n"
+            "---------------------------------------------------------------\n"
+            " 1.  Начать игру                                               \n"
+            " 2.  Сгенерировать новое расположение кораблей                 \n"
+            " 0.  Выйти из программы                                        \n"
+            "---------------------------------------------------------------")
         return gr_str
 
     def loop(self):
@@ -354,7 +356,8 @@ class Game():
                                 raise ExitGame
                             self.show_two_board()
                             if self.user.enemy_board.plus_shot():
-                                print('Игрок попал в корабль! Дополнительный ход.')
+                                print('Игрок попал в корабль!'
+                                      ' Дополнительный ход.')
                                 continue
                             break
                         print('Ход AI')
@@ -366,7 +369,8 @@ class Game():
                                 raise ExitGame
                             self.show_two_board()
                             if self.ai.enemy_board.plus_shot():
-                                print('AI попал в корабль! Дополнительный ход.')
+                                print('AI попал в корабль!'
+                                      ' Дополнительный ход.')
                                 continue
                             break
                     except ExitGame:
@@ -400,42 +404,13 @@ class Game():
         # self.ai_board.show_ships()
         # self.show_two_board()
         self.loop()
-    
+
     def ask_mode(self):
-        print("--------------------------------"*2)
+        # print("--------------------------------"*2)
         return input(" Выберите режим работы:   ")
 
 
-# %%
-xxx = Board()
-# print(xxx.map_br)
-print(xxx.show())
-# %%
-dd = Dot(1, 1)
-dd.near()
-# %%
 
-ggg = Game()
-ggg.user_board.add_ship(Ship(Dot(1, 1), 3, False))
-
-ggg.user_board.add_ship(Ship(Dot(1, 3), 3, True))
-
-ggg.user_board.random_board()
-ggg.user_board.show_cont()
-ggg.user_board.show_ships()
-
-ggg.ai_board.random_board()
-# ggg.ai_board.show_cont()
-ggg.ai_board.show_ships()
-ggg.ai_board.shots.append(Dot(1, 1))
-ggg.ai_board.shots.append(Dot(1, 2))
-ggg.ai_board.show_shots()
-
-
-ggg.show_two_board()
-# %%
-shhh = Ship(Dot(1, 1), 1, True)
-shhh.dots()
 # %%
 ggg = Game()
 # print(ggg.greet())
