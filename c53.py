@@ -20,9 +20,9 @@ def handle_start_help(message):
 def handle_start_salute(message):
     bot.send_message(message.chat.id, f'Привет: {message.chat.username}!!!')
 
-@bot.message_handler(content_types=['p'])
+@bot.message_handler(content_types=['photo'])
 def handle_rep_pict(message):
-    bot.send_message(message.chat.id, f'Привет: {message.chat.username}!!!')
+    bot.reply_to(message, 'Nice meme XDD')
 
 
 # Обрабатывается все документы и аудиозаписи
@@ -31,3 +31,4 @@ def handle_docs_audio(message):
     pass
 
 bot.polling(none_stop=True)
+# %%

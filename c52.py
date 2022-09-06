@@ -56,14 +56,16 @@ data = {'key': 'value'}
 # тип передаваемых данных будет JSON
 r = requests.post('https://httpbin.org/post', json=json.dumps(data))
 print(r.content)
+
 # %%
 
-
 r = requests.get('https://baconipsum.com/api/?type=meat-and-filler&paras=5')
-texts = json.loads(r.content)  # делаем из полученных байтов Python-объект для удобной работы
+# делаем из полученных байтов Python-объект для удобной работы
+texts = json.loads(r.content)
 print(texts[0])
 print(type(texts))  # проверяем тип сконвертированных данных
-
-for text in texts:  # выводим полученный текст. Но для того чтобы он влез в консоль, оставим только первые 50 символов.
+# выводим полученный текст. Но для того чтобы он влез в консоль,
+# оставим только первые 50 символов.
+for text in texts:
     print(text[:50], '\n')
 # %%
