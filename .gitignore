@@ -1,3 +1,4 @@
 .venv
 .vscode
 tg_bot.ini
+*.html
