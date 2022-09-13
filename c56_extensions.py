@@ -14,11 +14,13 @@ class APIclass():
             raise APIExeption(
                 "Количество значений должно "
                 "быть равно трем!")
+
         src, dst, amount = message.split(" ")
         if src == dst:
             raise APIExeption(
                 "Валюты обмена совпадают, "
                 "обменять невозможно!")
+
         try:
             float(amount)
         except ValueError as e:
@@ -34,6 +36,7 @@ class APIclass():
             raise APIExeption(
                 f"Валюта \"{src}\""
                 " не поддерживается!") from e
+
         try:
             dst_ticker = m_keys[dst]
         except KeyError as e:
