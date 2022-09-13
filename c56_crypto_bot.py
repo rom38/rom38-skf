@@ -44,7 +44,7 @@ greet_messsage = (
     " наберите /values"
 )
 
-print(greet_messsage)
+# print(greet_messsage)
 # %%
 print(data["rates"])
 # %%
@@ -64,17 +64,12 @@ def handle_values(message):
 
 @bot.message_handler(content_types=['text'])
 def handle_convert(message: telebot.types.Message):
-    # inn, out, amount = message.text.split(' ')
-    # amount = decimal.Decimal(amount)
-    # url = f'https://open.er-api.com/v6/latest/{MONEY_KEYS[inn]}'
-    # resp = requests.get(url)
-    # data = resp.json(parse_float=decimal.Decimal)['rates'][MONEY_KEYS[out]]
-    # data = data * amount
-
-    # result = (f'{amount} {inn} будут стоить {data} {out}')
     try:
         result = APIclass.get_price(message.text, MONEY_KEYS)
     except APIExeption as e:
+        print(e)
+        bot.reply_to(message, str(e))
+    except Exception as e:
         print(e)
         bot.reply_to(message, str(e))
     else:
