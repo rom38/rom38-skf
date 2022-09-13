@@ -48,8 +48,12 @@ class APIclass():
         resp = requests.get(url)
         # мне так больше нравится, не нужно импортировать json,
         # но по условию задачи json необходим
-        data = resp.json(parse_float=decimal.Decimal)["rates"][dst_ticker]
-        data = data * amount
+        # data = resp.json(parse_float=decimal.Decimal)["rates"][dst_ticker]
+        data = json.loads(resp.content, parse_float=decimal.Decimal)
+        data = data["rates"][dst_ticker]
+        total = data * amount
+        # убираем крайние нули после точки
+        total = total.normalize()
 
-        result = f"{amount} {src} будут стоить {data} {dst}"
+        result = f"{amount} {src} будут стоить {total} {dst}"
         return result

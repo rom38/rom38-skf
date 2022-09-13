@@ -2,10 +2,7 @@
 # имя бота @sk_c52_bot
 
 import configparser
-from urllib import request
 import telebot
-import requests
-import decimal
 
 from c56_extensions import APIExeption
 from c56_extensions import APIclass
@@ -27,13 +24,8 @@ bot = telebot.TeleBot(TOKEN)
 # %%
 
 # Where USD is the base currency you want to use
-url = "https://open.er-api.com/v6/latest/USD"
+# url = "https://open.er-api.com/v6/latest/USD"
 
-# Making our request
-response = requests.get(url)
-data = response.json()
-# Your JSON object
-# print(data["rates"]["ANG"])
 greet_messsage = (
     "Здравствуйте!\n"
     "Это бот для проверки курсов валют.\n"
@@ -44,9 +36,6 @@ greet_messsage = (
     " наберите /values"
 )
 
-# print(greet_messsage)
-# %%
-print(data["rates"])
 # %%
 
 
@@ -68,10 +57,10 @@ def handle_convert(message: telebot.types.Message):
         result = APIclass.get_price(message.text, MONEY_KEYS)
     except APIExeption as e:
         print(e)
-        bot.reply_to(message, str(e))
+        bot.reply_to(message, f"Ошибка пользователя!\n{e}")
     except Exception as e:
         print(e)
-        bot.reply_to(message, str(e))
+        bot.reply_to(message, f"Не могу обработать команду!\n{e}")
     else:
         bot.reply_to(message, result)
 
