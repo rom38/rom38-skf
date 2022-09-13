@@ -1,4 +1,5 @@
 # %%
+# имя бота @sk_c52_bot
 
 import configparser
 from urllib import request
@@ -32,13 +33,15 @@ url = "https://open.er-api.com/v6/latest/USD"
 response = requests.get(url)
 data = response.json()
 # Your JSON object
-print(data["rates"]["ANG"])
+# print(data["rates"]["ANG"])
 greet_messsage = (
     "Здравствуйте!\n"
     "Это бот для проверки курсов валют.\n"
     "Правила использования.\nНеобходимо указать три значения "
     "через пробел: исходная валюта, "
-    "валюта перевода, количество"
+    "валюта перевода, количество.\n"
+    " Для получения списка доступных валют"
+    " наберите /values"
 )
 
 print(greet_messsage)
