@@ -5,3 +5,4 @@ tg_bot.ini
 dump.rdb
 __pycache__
 c56_bot.ini
+*.sqlite3
