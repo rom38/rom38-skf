@@ -65,5 +65,5 @@ def handle_convert(message: telebot.types.Message):
         bot.reply_to(message, result)
 
 
-bot.polling(none_stop=True, skip_pending=True)
+bot.infinity_polling(skip_pending=True)
 # %%
